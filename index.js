@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -20,12 +20,31 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const categoryCollection = client.db('cardbUser').collection('categories')
+        const bookingsCollection = client.db('cardbUser').collection('bookings')
+
         app.get('/categories', async (req, res) => {
             const query = {}
             const cursor = categoryCollection.find(query);
             const categories = await cursor.toArray();
             res.send(categories);
         });
+
+
+        app.get('/categories/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const categories = await categoryCollection.findOne(query);
+            res.send(categories);
+        });
+
+
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
+            console.log(booking);
+
+            const result = await bookingsCollection.insertOne(booking);
+            res.send(result);
+        })
     }
     finally {
 
