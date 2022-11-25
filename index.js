@@ -42,6 +42,7 @@ async function run() {
         const categoryCollection = client.db('cardbUser').collection('categories')
         const bookingsCollection = client.db('cardbUser').collection('bookings')
         const usersCollection = client.db('cardbUser').collection('users')
+        // const sellersCollection = client.db('cardbUser').collection('sellers')
 
         app.get('/categories', async (req, res) => {
             const query = {}
@@ -97,10 +98,25 @@ async function run() {
 
 
         app.get('/users', async (req, res) => {
-            const query = {};
+            const query = { choose: 'User' };
             const users = await usersCollection.find(query).toArray();
             res.send(users);
         });
+
+
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(filter);
+            res.send(result);
+        })
+
+
+        app.get('/sellers', async (req, res) => {
+            const query = { choose: 'Seller' };
+            const sellers = await usersCollection.find(query).toArray();
+            res.send(sellers)
+        })
 
 
         app.get('/users/admin/:email', async (req, res) => {
