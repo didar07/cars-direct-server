@@ -44,8 +44,8 @@ async function run() {
         const bookingsCollection = client.db('cardbUser').collection('bookings')
         const usersCollection = client.db('cardbUser').collection('users')
         const paymentsCollection = client.db('cardbUser').collection('payments')
+        const productsCollection = client.db('cardbUser').collection('products')
 
-        // const sellersCollection = client.db('cardbUser').collection('sellers')
 
         app.get('/categories', async (req, res) => {
             const query = {}
@@ -53,6 +53,16 @@ async function run() {
             const categories = await cursor.toArray();
             res.send(categories);
         });
+
+
+        app.get('/category', async (req, res) => {
+            const query = {}
+            const result = await categoryCollection.find(query).project({ category_name: 1 }).toArray()
+
+            res.send(result);
+        });
+
+
 
 
         app.get('/categories/:id', async (req, res) => {
@@ -134,8 +144,10 @@ async function run() {
 
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
+            console.log(email)
             const query = { email: email };
             const user = await usersCollection.findOne(query);
+            console.log(user)
             if (user) {
                 const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '1d' })
                 return res.send({ accessToken: token });
@@ -182,7 +194,6 @@ async function run() {
         })
 
 
-
         app.post('/users', async (req, res) => {
             const user = req.body;
             console.log(user);
@@ -213,6 +224,12 @@ async function run() {
             }
             const result = await usersCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
+        })
+
+        app.post('/products', async (req, res) => {
+            const product = req.body
+            const result = await productsCollection.insertOne(product)
+            res.send(result)
         })
     }
     finally {
