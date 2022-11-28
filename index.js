@@ -226,9 +226,24 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/products', async (req, res) => {
+            const query = {}
+            const products = await productsCollection.find(query).toArray()
+            res.send(products)
+        })
+
+
         app.post('/products', async (req, res) => {
             const product = req.body
             const result = await productsCollection.insertOne(product)
+            res.send(result)
+        })
+
+
+        app.delete('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(filter)
             res.send(result)
         })
     }
